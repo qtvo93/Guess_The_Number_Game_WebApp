@@ -187,7 +187,7 @@ if choice == "Version Update":
     st.text("* Updated sidebar, added View Data Option")
     st.text("* Added number of guess counter")
     
-    st.header("Version 1.0 - 04/28/2021")
+    st.header("Version 1.1 - 04/28/2021")
     st.text("* Fixed bugs cache auto-refreshing")
     st.text("* Fixed bugs overflow from user's input")
     
