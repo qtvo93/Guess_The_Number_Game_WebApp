@@ -11,15 +11,18 @@ import random
 import functools
 import time
 import pandas as pd
-
-st.title('Guessing the random number')
+import SessionState
+from streamlit import caching
+from streamlit.script_runner import StopException, RerunException
+st.title('Guess the Number Game')
 
 #---------------------------------#
 # About
 expander_bar = st.beta_expander("About")
 expander_bar.markdown("""
-* **Python libraries:**  streamlit, numpy, functools, random 
-* **Credit:** app written by [Quoc Thinh Vo](https://site.quoctvo.com).
+* **Guess the Number Game** is a simple Web-App to demonstrate Python and Data Science framework
+* **Python libraries:**  streamlit, numpy, functools, random, matplotlib
+* **Credit:** app written by [Quoc Thinh Vo](https://site.quoctvo.com)
 """)
 
 
@@ -57,7 +60,7 @@ def cache_on_button_press(label, **cache_kwargs):
 
 #%% Side bar
 st.sidebar.header("Please choose an option")
-menu = ["Play Game", "View Data"]
+menu = ["Play Game", "View Data", "Version Update"]
 choice = st.sidebar.selectbox("Menu", menu)    	
 #%% function declarations
 
@@ -71,6 +74,7 @@ def play(min_num,max_num):
  
 #%% Section 1: header and number interval picking
 if choice == "Play Game":
+    ss = SessionState.get(x=1)
     st.header('Please choose a number range:')
     st.text("  ")
     min_num=st.slider("Minimum:",0,9999,1000)
@@ -91,15 +95,18 @@ if choice == "Play Game":
     guess= st.text_input("Guess number:")
     
     #%% Authenticate guess vs random num
-          
+     
+    
+     
     if authenticate(str(rand_num), (guess)):
         if guess == "":
             st.text("Please enter a number before pressing Guess button!")  
         st.write("Random number is: ",rand_num)
         st.success('Congratulations, your guess is right!')
-        #st.write("You win the game with",t1, "guessing plays")
-              
-    else:   
+        st.write("You win the game with",ss.x, "guessing plays")
+        ss.x = 1     
+    else: 
+        ss.x +=1
         if guess != "":        
             if(rand_num) < int(guess):
                 st.warning('Random number is smaller than your guess')            
@@ -108,6 +115,7 @@ if choice == "Play Game":
         else:
             st.text("Please enter a valid number")
         st.stop().Exception()
+    
     
     #%% Footer + Rating the app
            
@@ -123,7 +131,9 @@ if choice == "Play Game":
 import matplotlib.pyplot as plt
 
 if choice == "View Data":
-    st.text("  ")
+    st.text(" ")
+    st.write("Data for demonstration purposes only")
+    st.write("Live update scraping data will be coming soon in the next version")
     player = 59
     winner = 55
     number_of_players = st.write("Players:",player)
@@ -138,7 +148,7 @@ if choice == "View Data":
         x_data.append(x+1)
     average = int(sum(y_data) / len(y_data) )
     best= min(y_data)
-    best_record= st.write("Best record: Player ID 34 won with ", best, "guess(es)")
+    best_record= st.write("Best record: Player won with ", best, "guess(es)")
     print_average = st.write("Average guess per play:",average)
     st.text("  ")
     fig = plt.figure()
@@ -153,13 +163,43 @@ if choice == "View Data":
     ax.set_xlabel("Number of Winner")
     
     st.write(fig)
+    st.text(" ")
     st.write("Live time scraping data is being worked on and will be updated soon.")
 
 
+#%% Version update
 
+if choice == "Version Update":
+    
+    st.header("Upcoming Updates")
+    st.text("* Adding SQL data base for game experience recording")
+    st.text("* Updating live web scraping data")
+    st.header("Potential Updates")
+    st.text("* Adding user sign up for personal records")
+    st.text("* Building a Machine Learning model to study player's strategy and replicate performance")
+    
+    st.header("Version 2.0 - 05/03/2021")
+    st.text("* Rebuilt constructions for mobile version")
+    st.text("* Updated sidebar, added Version Update Option")
+    
+    st.header("Version 1.2 - 04/30/2021")
+    st.text("* User choices: Updated Minimum and Maximum range")
+    st.text("* Updated sidebar, added View Data Option")
+    st.text("* Added number of guess counter")
+    
+    st.header("Version 1.0 - 04/28/2021")
+    st.text("* Fixed bugs cache auto-refreshing")
+    st.text("* Fixed bugs overflow from user's input")
+    
+    st.header("Version 1.0 - 04/20/2021")
+    st.text("* Uploaded Web-beta version")
+    st.text("* Tested Gameplay and Data Flow")
+    
+    
+    
+    
 
-
-
+    
 
 
 
