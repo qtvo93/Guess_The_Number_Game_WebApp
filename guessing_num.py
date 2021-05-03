@@ -20,9 +20,10 @@ st.title('Guess the Number Game')
 # About
 expander_bar = st.beta_expander("About")
 expander_bar.markdown("""
-* **Guess the Number Game** is a simple Web-App to demonstrate Python and Data Science framework
+* **Guess the Number Game** is a simple Web-App to demonstrate Python and Data Science streamlit framework
 * **Python libraries:**  streamlit, numpy, functools, random, matplotlib
-* **Credit:** app written by [Quoc Thinh Vo](https://site.quoctvo.com)
+* **Version 2.0:** App written by [Quoc Thinh Vo](https://site.quoctvo.com). 
+    Please open Sidebar menu and choose Version Update for more information
 """)
 
 
@@ -103,7 +104,7 @@ if choice == "Play Game":
             st.text("Please enter a number before pressing Guess button!")  
         st.write("Random number is: ",rand_num)
         st.success('Congratulations, your guess is right!')
-        st.write("You win the game with",ss.x, "guessing plays")
+        st.write("You win the game with",ss.x, "guessing play(s)")
         ss.x = 1     
     else: 
         ss.x +=1
@@ -163,6 +164,8 @@ if choice == "View Data":
     ax.set_xlabel("Number of Winner")
     
     st.write(fig)
+   
+ 
     st.text(" ")
     st.write("Live time scraping data is being worked on and will be updated soon.")
 
