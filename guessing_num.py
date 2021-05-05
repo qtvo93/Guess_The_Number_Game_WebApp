@@ -127,7 +127,7 @@ if choice == "Play Game":
     min_num = 0
     max_num = 0
     if level == "Easy":
-        max_num = 40
+        max_num = 30
     elif level == "Medium":
         max_num = 100
     elif level == "Hard":
@@ -164,7 +164,7 @@ if choice == "Play Game":
             st.write("You win the game with",state.a, "guessing play(s)")
             state.a = 1
         else: 
-            
+            #st.write(rand_num)
             state.a +=1
             state.b += 1
             if guess != "":        
@@ -173,11 +173,24 @@ if choice == "Play Game":
                 elif (rand_num) > int(guess):
                     st.error('Random number is greater than your guess')    
             else:
-                st.text("Please enter a valid number")
+                state.a -=1
+                state.b -= 1
+                st.error("Please enter a valid number")
             st.stop().Exception()
     
     
     #%% Footer + Rating the app
+    
+    @st.cache(suppress_st_warning = True)
+    def form(suppress_st_warning = True):
+        my_bar = st.progress(0)
+        for percent in range(100):
+            time.sleep(0.1)
+            my_bar.progress(percent+1)
+        st.spinner()
+        with st.spinner(text=''):
+            time.sleep(5)
+            st.success('Done')     
            
     with st.form(key ='record_play'):
         #SQL data base generating:
@@ -189,9 +202,9 @@ if choice == "Play Game":
         st.subheader("Would you like to submit your records?")
         firstname , lastname = st.beta_columns(2)
         with firstname:
-            F_name = st.text_input("Firstname")
+            F_name = st.text_input("Name")
         with lastname:
-            L_name = st.text_input("Lastname")
+            L_name = st.text_input("Nickname (will be publicly displayed)")
         
         note, date = st.beta_columns([3,1])
         notefeed = note.text_input("Feedback (Optional)")
@@ -199,74 +212,73 @@ if choice == "Play Game":
         rate = int(st.slider("Rate this App:",0,10,6))
         
         submit_button = st.form_submit_button(label='Submit')
-    if submit_button:
-        try:
+    if submit_button :
+        if str(rand_num)!= (guess):
+            st.error("Oops! Only winner can submit records")
             
-            entry = UserInput(firstname=F_name,
-                              lastname=L_name,
-                              no_of_guess=state.b,
-                              date_win=datewin,
-                              feedback = notefeed,
-                              rating = rate)
-          #  user_query = sess.query(UserInput).filter_by(firstname=F_name)\
-             #   .filter_by(lastname=L_name).filter_by(no_of_guess=ss.x)\
-                # .filter_by(date_win=datewin).filter_by(feedback = notefeed)
-            add_logic = True
-            results = sess.query(UserInput).all()
-            for item in results:
-                if item.firstname == F_name:
-                    if item.lastname == L_name:
-                        if item.no_of_guess==state.b:
-                            if item.date_win ==datewin:        
-                                add_logic=False
-                                
-            if add_logic == True:
-                sess.add(entry)
-                sess.commit()
-                st.balloons()
-                state.b = 1
+        else:
+            try:
                 
-                if F_name != "":
-                    st.success("Thank you {} for submitting your playing records!".format(F_name))
+                entry = UserInput(firstname=F_name,
+                                  lastname=L_name,
+                                  no_of_guess=state.b,
+                                  date_win=datewin,
+                                  feedback = notefeed,
+                                  rating = rate)
+              #  user_query = sess.query(UserInput).filter_by(firstname=F_name)\
+                 #   .filter_by(lastname=L_name).filter_by(no_of_guess=ss.x)\
+                    # .filter_by(date_win=datewin).filter_by(feedback = notefeed)
+                add_logic = True
+                results = sess.query(UserInput).all()
+                for item in results:
+                    if item.firstname == F_name:
+                        if item.lastname == L_name:
+                            if item.no_of_guess==state.b:
+                                if item.date_win ==datewin:        
+                                    add_logic=False
+                                    
+                if add_logic == True:
+                    sess.add(entry)
+                    sess.commit()
+                    
+                    
+                    
+                    if F_name == "" and L_name == "":
+                        st.error("Please enter your name or leave Name blank and input letter 'A' in Nickname to stay Anonymous")
+                    else:
+                        st.balloons()
+                        state.b = 1
+                        if F_name != "":
+                            st.success("Thank you {} for submitting your playing records!".format(F_name))
+                        else:
+                            st.success("Thank you for submitting your playing records!")
+                        st.write("⏳ Submitting your form now...")
+                        my_bar = st.progress(0)
+                        for percent in range(100):               
+                            my_bar.progress(percent+1)
+                            time.sleep(0.04)
+                            
+                        st.success('✅ Your form has been submitted. The game will automatically reset shortly')
+                        time.sleep(6)
+                        caching.clear_cache()
+                        raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
                 else:
-                    st.success("Thank you for submitting your playing records!")
-            else:
-                if F_name == "" and L_name == "":
-                    st.error("Please enter your name")   
-                else:
-                    st.error("Please do not resubmit an existing record")
-        except Exception as e:
-            st.error(f"Some error occured : {e}")
-    
-    if st.button("Reset Page and Play again"):
-        caching.clear_cache()
-        raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
-        
-    with st.form('records_form'):
-        st.subheader("Please input your first and last name to see your records")
-        firstname2 , lastname2 = st.beta_columns(2)
-        with firstname2:
-            F_name2 = st.text_input("Firstname")
-        with lastname2:
-            L_name2 = st.text_input("Lastname")
+                       st.error("Please do not resubmit an existing record")      
             
-        view_data_button = st.form_submit_button(label='Click to view records')
-       
-    if view_data_button:
-        results = sess.query(UserInput).filter_by(firstname=F_name2)\
-            .filter_by(lastname=L_name2)
+             
+            
+            except Exception as e:
+                st.error(f"Some error occured : {e}")
+                st.error('❌ The page will reset shortly')
+                time.sleep(6)
         
-        for item in results:   
-            st.header("Player information:")
-            firstname3 , lastname3 = st.beta_columns([1,9])
-            firstname3.subheader(item.firstname)
-            lastname3.subheader(item.lastname)
-
-            st.write("Winner with",item.no_of_guess ,"guess(es)")
-            st.write("On Date:",item.date_win)
-     
-    
-    
+            
+            
+    # if st.button("Reset Page and Play again"):
+    #     caching.clear_cache()
+    #     raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
+        
+ 
               
 #%% choice == View data
 import matplotlib.pyplot as plt
@@ -284,14 +296,22 @@ if choice == "View Data":
     player=0
     num_guess=[]
     player_ID=[]
+    no_ID = []
+    
+    # Qeury for all user in the database:
     results = sess.query(UserInput).all()
+    
     for item in results:   
         player+=1
         num_guess.append(item.no_of_guess)
-        player_ID.append(item.firstname)
+        player_ID.append(item.lastname)
+        no_ID.append(item.id)
+    
+     
+    # Print number of winner and average guess per player:  
     st.write("🏆 Registered winners:",player)
     average = int(sum(num_guess) / len(num_guess) )
-    print_average = st.write("  ⏳  Average guess per player:",average)
+    print_average = st.write("  🔥   Average guess per player:",average)
     x_axis = [(x+1) for x in range(player)]        
     # y_data=[]
     # for y in range(int(winner)):
@@ -300,29 +320,53 @@ if choice == "View Data":
     # for x in range(int(winner)):
     #     x_data.append(x+1)
     
-    dict_player ={}
-    for key,no_guess in zip(player_ID,num_guess):
-        dict_player[key]= no_guess
-        
-    best= min(num_guess) 
-    print_out_winner=[]
-    for playerID,guess_item in dict_player.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
+    
+    # make dict of User ID : number of guess
+    ID_dict = {}
+    for ano,ano_guess in zip(no_ID,num_guess):
+        ID_dict[ano] = ano_guess
+    
+    # make dict of User Nick Name: number of guess 
+    Player_ID_dict = {}
+    for i,p in zip(no_ID,player_ID):
+        Player_ID_dict[i] = p
+    
+    # Find best winner and corresponding ID:
+    best= min(num_guess)     
+    find_winner_ID = []
+    
+    for ID,guess_item in ID_dict.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
         if guess_item == best:
-            print_out_winner.append(playerID)
+            find_winner_ID .append(ID)           
+            
+    total_winner = len(find_winner_ID)
+    print_out_winner=[]
+    for i in range(total_winner):
+         index_value = find_winner_ID [i]
+         print_out_winner.append(Player_ID_dict[index_value])
+        
+    best_record= st.write("⭐ Best record:", total_winner, " winner(s) won with", best,"guess(es)")
     
-    
-    best_record= st.write("⭐ Best record: winner(s) with", best,"guess(es)")
-    if st.checkbox("View Winner with Best Record List"):
-        st.text("Player First Name:")
+    if st.checkbox("Check to see winner list"):
+        st.write(" 🏁 Player's Nickname:")
+        Id = 0
+        control_anonymous = 0
         for player_out in print_out_winner:
-            st.text(player_out)
+            Id+=1           
+            if player_out != "":              
+                st.write(Id,":",player_out)
+            else:              
+                registed_ID = find_winner_ID[control_anonymous]
+                st.write(Id,":","Anonymous registered ID",registed_ID)
+            control_anonymous+=1   
     
-    st.text("  ")
-    
+    # Graph players vs guesses
+    st.subheader("Winner Registration ID vs Number of guess per Winner ID")
     fig = plt.figure(1)
     ax = fig.add_subplot(1,1,1)
     
-    ax.xaxis.set_ticks(np.arange(min(x_axis), max(x_axis)+1, 1))
+    if max(x_axis) < 25:
+        ax.xaxis.set_ticks(np.arange(min(x_axis), max(x_axis)+1, 1))
     ax.plot(
         x_axis,
             num_guess,
@@ -331,13 +375,60 @@ if choice == "View Data":
     ax.grid()
     ax.set_ylabel("Number of guess")
     ax.set_xlabel("Winner Registration ID")
+    st.write(fig)
     
-    bins = num_guess
+    # Retrieve data form
+    with st.form('records_form'):
+        st.subheader("Would you like to check your personal records?")
+        firstname2 , lastname2 = st.beta_columns(2)
+        with firstname2:
+            F_name2 = st.text_input("Name")
+        with lastname2:
+            L_name2 = st.text_input("Nickname")
+            
+        view_data_button = st.form_submit_button(label='Click to view records')
+       
+    if view_data_button:
+        results = sess.query(UserInput).filter_by(firstname=F_name2)\
+            .filter_by(lastname=L_name2)
+            
+        count_item = 0
+        for item in results:   
+            st.header("Player information:")
+            
+            firstname3 = item.firstname
+            lastname3 = item.lastname
+            
+            f = ""
+            l = ""
+            if (firstname3 == "" and lastname3 =="A" ) or ( firstname3 == "" and lastname3 =="a" ):
+                f = "---"
+                l = "Anonymous player"
+            else: 
+                f = firstname3
+                l = lastname3
+                
+            st.write("Name:",f)
+            st.write("Nick name:",l )
+            count_item +=1
+            st.write("Winner with",item.no_of_guess ,"guess(es)")
+            st.write("On Date:",item.date_win)
+            
+        if count_item == 0:
+            st.error("No records found for this user")
+            
+        if st.button("Clear Displays"):
+            caching.clear_cache()
+            raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
+    
+    # fig2 pwer of 2
     fig2 = plt.figure(2)
     ax2 = fig2.add_subplot(2,1,1)
+    
+    x_axis2 = [(x+1) for x in range(total_winner)]
     y_highfive = 0
     y_high_list=[]
-    for i in range(player):
+    for i in range(total_winner):
         if y_highfive == 0:
             y_highfive = 1
             y_high_list.append(y_highfive)
@@ -346,19 +437,21 @@ if choice == "View Data":
             y_high_list.append(y_highfive)
           
     ax2.plot(
-        x_axis,
+        x_axis2,
            y_high_list ,
         )
-    ax2.set_ylabel("Number of high five")
-    ax2.set_xlabel("Number of Winner who gave me high-fives")
-    
-    st.write(fig)
-    st.subheader("The power of 2")
-    st.write("Imagine the number of high five I would receive after each time we got a winner")  
-    st.write("Assuming that all winners would give me high-fives")
+    if max(x_axis2) < 25:
+        ax2.xaxis.set_ticks(np.arange(min(x_axis2), max(x_axis2)+1, 1))
+    ax2.set_ylabel("Number of candies")
+    ax2.set_xlabel("Number of new record Winner")  
+    # 🔥 fire icon     
+    st.subheader("The power of two")
+    st.write("Imagine the number of candies I would receive after each time we got a new record winner")  
+    st.write("Assuming that all record winners would send me some candies")
     current_h5= max(y_high_list)
-    st.write(" 🔥 Current high-fives received:",current_h5)
-    st.write("✨","WOW! Thank you everyone for parcitipating and having fun together. Cheers!")
+    st.write("🍭 Current candies received:",current_h5)
+    st.write(" 💖 Thank everyone for parcitipating, supporting, sending sweetness and having fun together")
+    st.write(" ✨ Cheers!")
     st.write(fig2)
  
     st.text(" ")
@@ -376,14 +469,16 @@ if choice == "Version Update":
     
     st.subheader("Potential Updates")
     st.write("* Adding user sign up with hashed password for personal records")
-    st.write("* Building a Machine Learning model to study strategy and replicate pattern recognition")
+    st.write("* Building a Machine Learning model to study user's strategy and replicate performance")
     
-    st.subheader("Version 2.1 - 05/04/2021")
+    st.subheader("Version 2.1 - 05/05/2021")
     st.write("* Added SQL data base for game experience recording")
     st.write("* Updated live web scraping data")
     st.write("* Changed: GUI - Minimum and Maximum number: from slider to input box")
-    st.write("* Changed: GUI - removed Sidebar - Added Navigation bar")
-    st.write("* Updated best record player")
+    st.write("* Changed: GUI - Removed Sidebar - Added Navigation bar")
+    st.write("* Added: Best record player nickname")
+    st.write("* Added: Retrieving personal records functionality")
+    
     
     st.subheader("Version 2.0 - 05/02/2021")
     st.write("* Re-constructed for mobile version")
