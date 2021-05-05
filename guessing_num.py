@@ -43,7 +43,7 @@ st.title('Guess the Number Game')
 
 #---------------------------------#
 # About
-expander_bar = st.beta_expander("About the App",expanded=True)
+expander_bar = st.beta_expander("About the App")
 
 expander_bar.markdown("""
 * **Guess the Number Game** is a simple Web-App to demonstrate Python, SQL and Data Science streamlit framework
@@ -122,7 +122,7 @@ if choice == "Play Game":
     #     st.text("Please adjust the interval and try again")
     #     st.stop().Exception()
     
-    menu2 = ["Easy","Medium","Hard"]
+    menu2 = ["Easy","Medium","Hard", "Custom"]
     level = st.selectbox("Level:",menu2)
     min_num = 0
     max_num = 0
@@ -132,6 +132,20 @@ if choice == "Play Game":
         max_num = 100
     elif level == "Hard":
         max_num = 500
+    elif level == "Custom":
+        min_num=st.number_input("Minimum Number (0 - 10000):",
+                        max_value = 10000,
+                        min_value= 0,
+                        value =500)
+        max_num=st.number_input("Maximum Number (0 - 10000):",
+                        max_value = 10000,
+                        min_value= 0,
+                        value =600)
+        if min_num > max_num:
+            st.error("Max number cannot be smaller than Min number")
+            st.write("Please adjust the interval and try again")
+            st.stop().Exception()
+        
         
     min_num= int(min_num)
     max_num= int(max_num)
