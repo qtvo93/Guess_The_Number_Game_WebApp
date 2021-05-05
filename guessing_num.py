@@ -164,7 +164,7 @@ if choice == "Play Game":
             st.write("You win the game with",state.a, "guessing play(s)")
             state.a = 1
         else: 
-            st.write(rand_num)
+            
             state.a +=1
             state.b += 1
             if guess != "":        
