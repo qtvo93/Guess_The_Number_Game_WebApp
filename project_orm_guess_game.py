@@ -26,5 +26,5 @@ class UserInput(Base):
     rating= Column(Integer)
     
 if __name__ == "__main__":
-    engine = create_engine('sqlite:///guessnumber_game_db.sqlite')
+    engine = create_engine('sqlite:///number_game2_db.sqlite')
     Base.metadata.create_all(engine)
