@@ -11,10 +11,12 @@ import streamlit as st
 import random
 import functools
 import time
+import numpy as np
+
 #import pandas as pd
 #import SessionState
-#from streamlit import caching
-#from streamlit.script_runner import StopException, RerunException
+from streamlit import caching
+from streamlit.script_runner import StopException, RerunException
 from sqlalchemy.orm import sessionmaker
 from project_orm_guess_game import UserInput  
 from sqlalchemy import create_engine
@@ -46,8 +48,8 @@ expander_bar = st.beta_expander("About the App",expanded=True)
 expander_bar.markdown("""
 * **Guess the Number Game** is a simple Web-App to demonstrate Python, SQL and Data Science streamlit framework
 * **Python libraries:**  streamlit, numpy, functools, random, matplotlib, sqlalchemy
-* **Version 2.0:** App written by [Quoc Thinh Vo](https://quoctvo.com). 
-    Please open the Navigation bar and choose Version Update for more information                                                                                                                                        
+* **Version 2.1:** App written by [Quoc Thinh Vo](https://quoctvo.com). 
+    Please open the Navigation menu and choose Version Update for more information                                                                                                                                        
 
     
 """ )
@@ -99,24 +101,38 @@ def authenticate(rand,gue):
 @cache_on_button_press("Let's play")
 def play(min_num,max_num):
     return random.randint(min_num,max_num)
- 
+
+@cache_on_button_press("Click here to reset")
+def play_2(min_num,max_num):
+    return random.randint(min_num,max_num)
 #%% Section 1: header and number interval picking
 if choice == "Play Game":
     
-    st.subheader('Please choose a number range:')
-    st.text("  ")
-    min_num=st.number_input("Minimum Number (0-10000):",
-                       max_value = 10000,
-                       min_value= 0,
-                       value =500)
-    max_num=st.number_input("Maximum Number (0-10000):",
-                       max_value = 10000,
-                       min_value= 0,
-                       value =600)
-    if min_num > max_num:
-        st.error("Max number cannot be smaller than Min number")
-        st.text("Please adjust the interval and try again")
-        st.stop().Exception()
+    st.subheader('Please choose a difficult level:')
+    # min_num=st.number_input("Minimum Number (0-10000):",
+    #                    max_value = 10000,
+    #                    min_value= 0,
+    #                    value =500)
+    # max_num=st.number_input("Maximum Number (0-10000):",
+    #                    max_value = 10000,
+    #                    min_value= 0,
+    #                    value =600)
+    # if min_num > max_num:
+    #     st.error("Max number cannot be smaller than Min number")
+    #     st.text("Please adjust the interval and try again")
+    #     st.stop().Exception()
+    
+    menu2 = ["Easy","Medium","Hard"]
+    level = st.selectbox("Level:",menu2)
+    min_num = 0
+    max_num = 0
+    if level == "Easy":
+        max_num = 40
+    elif level == "Medium":
+        max_num = 100
+    elif level == "Hard":
+        max_num = 500
+        
     min_num= int(min_num)
     max_num= int(max_num)
     
@@ -148,6 +164,7 @@ if choice == "Play Game":
             st.write("You win the game with",state.a, "guessing play(s)")
             state.a = 1
         else: 
+            st.write(rand_num)
             state.a +=1
             state.b += 1
             if guess != "":        
@@ -207,6 +224,8 @@ if choice == "Play Game":
                 sess.add(entry)
                 sess.commit()
                 st.balloons()
+                state.b = 1
+                
                 if F_name != "":
                     st.success("Thank you {} for submitting your playing records!".format(F_name))
                 else:
@@ -219,6 +238,10 @@ if choice == "Play Game":
         except Exception as e:
             st.error(f"Some error occured : {e}")
     
+    if st.button("Reset Page and Play again"):
+        caching.clear_cache()
+        raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
+        
     with st.form('records_form'):
         st.subheader("Please input your first and last name to see your records")
         firstname2 , lastname2 = st.beta_columns(2)
@@ -241,8 +264,10 @@ if choice == "Play Game":
 
             st.write("Winner with",item.no_of_guess ,"guess(es)")
             st.write("On Date:",item.date_win)
-            
-            
+     
+    
+    
+              
 #%% choice == View data
 import matplotlib.pyplot as plt
 
@@ -252,18 +277,21 @@ if choice == "View Data":
     sess= Session()
     
     st.text(" ")
-    st.subheader("Guess the Number Game Statistics")
-    st.write("Data for demonstration purposes only")
-    st.write("This current development sprint is using live update scraping data version")
+    st.subheader("Guess the Number Game Statistics:")
+    st.text("+ Data for demonstration purposes only +")
+    st.write("This current development sprint is upgraded with live update scraping data version")
    
     player=0
     num_guess=[]
+    player_ID=[]
     results = sess.query(UserInput).all()
     for item in results:   
         player+=1
         num_guess.append(item.no_of_guess)
-        
-    st.write("Registered winners:",player)
+        player_ID.append(item.firstname)
+    st.write("🏆 Registered winners:",player)
+    average = int(sum(num_guess) / len(num_guess) )
+    print_average = st.write("  ⏳  Average guess per player:",average)
     x_axis = [(x+1) for x in range(player)]        
     # y_data=[]
     # for y in range(int(winner)):
@@ -271,62 +299,108 @@ if choice == "View Data":
     # x_data=[]
     # for x in range(int(winner)):
     #     x_data.append(x+1)
-    average = int(sum(num_guess) / len(num_guess) )
-    best= min(num_guess)
-    best_record= st.write("Best record: Player won with ", best, "guess(es)")
-    print_average = st.write("Average guess per player:",average)
+    
+    dict_player ={}
+    for key,no_guess in zip(player_ID,num_guess):
+        dict_player[key]= no_guess
+        
+    best= min(num_guess) 
+    print_out_winner=[]
+    for playerID,guess_item in dict_player.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
+        if guess_item == best:
+            print_out_winner.append(playerID)
+    
+    
+    best_record= st.write("⭐ Best record: winner(s) with", best,"guess(es)")
+    if st.checkbox("View Winner with Best Record List"):
+        st.text("Player First Name:")
+        for player_out in print_out_winner:
+            st.text(player_out)
+    
     st.text("  ")
-    fig = plt.figure()
+    
+    fig = plt.figure(1)
     ax = fig.add_subplot(1,1,1)
     
+    ax.xaxis.set_ticks(np.arange(min(x_axis), max(x_axis)+1, 1))
     ax.plot(
         x_axis,
             num_guess,
         )
     
-    ax.set_ylabel("Number of guess per Winner")
-    ax.set_xlabel("Number of Winner")
+    ax.grid()
+    ax.set_ylabel("Number of guess")
+    ax.set_xlabel("Winner Registration ID")
+    
+    bins = num_guess
+    fig2 = plt.figure(2)
+    ax2 = fig2.add_subplot(2,1,1)
+    y_highfive = 0
+    y_high_list=[]
+    for i in range(player):
+        if y_highfive == 0:
+            y_highfive = 1
+            y_high_list.append(y_highfive)
+        else:
+            y_highfive= y_highfive*2
+            y_high_list.append(y_highfive)
+          
+    ax2.plot(
+        x_axis,
+           y_high_list ,
+        )
+    ax2.set_ylabel("Number of high five")
+    ax2.set_xlabel("Number of Winner who gave me high-fives")
     
     st.write(fig)
-   
+    st.subheader("The power of 2")
+    st.write("Imagine the number of high five I would receive after each time we got a winner")  
+    st.write("Assuming that all winners would give me high-fives")
+    current_h5= max(y_high_list)
+    st.write(" 🔥 Current high-fives received:",current_h5)
+    st.write("✨","WOW! Thank you everyone for parcitipating and having fun together. Cheers!")
+    st.write(fig2)
  
     st.text(" ")
-    st.write("Live time scraping data needs some time to update")
+    st.write("**Note**: Live time scraping data needs some time to update depending on the network")
 
 
 #%% Version update
 
 if choice == "Version Update":
     
-    st.header("Upcoming Updates")
-    st.text("* Updating base script and css")
+    st.subheader("Upcoming Updates")
+    st.write("* Updating base script and css")
+    st.write("* Updating data seperately for each difficult level")
+    st.write("* Updating widget showing the most favorite choice of difficult level")
     
-    st.header("Potential Updates")
-    st.text("* Adding user sign up with hashed password for personal records")
-    st.text("* Building a Machine Learning model to study player's strategy and replicate performance")
+    st.subheader("Potential Updates")
+    st.write("* Adding user sign up with hashed password for personal records")
+    st.write("* Building a Machine Learning model to study strategy and replicate pattern recognition")
     
-    st.header("Version 2.1 - 05/04/2021")
-    st.text("* Added SQL data base for game experience recording")
-    st.text("* Updated live web scraping data")
-    st.text("* Changed: GUI - from slider interval input box")
-    st.text("* Changed: GUI - removed Sidebar - Added Navigation bar")
+    st.subheader("Version 2.1 - 05/04/2021")
+    st.write("* Added SQL data base for game experience recording")
+    st.write("* Updated live web scraping data")
+    st.write("* Changed: GUI - Minimum and Maximum number: from slider to input box")
+    st.write("* Changed: GUI - removed Sidebar - Added Navigation bar")
+    st.write("* Updated best record player")
     
-    st.header("Version 2.0 - 05/02/2021")
-    st.text("* Rebuilt constructions for mobile version")
-    st.text("* Updated sidebar, added Version Update Option")
+    st.subheader("Version 2.0 - 05/02/2021")
+    st.write("* Re-constructed for mobile version")
+    st.write("* Updated sidebar, added Version Update Option")
     
-    st.header("Version 1.2 - 04/30/2021")
-    st.text("* User choices: Updated Minimum and Maximum range")
-    st.text("* Updated sidebar, added View Data Option")
-    st.text("* Added number of guess counter")
+    st.subheader("Version 1.2 - 04/30/2021")
+    st.write("* User choices: Updated Minimum and Maximum range")
+    st.write("* Updated sidebar, added View Data Option")
+    st.write("* Added number of guess counter")
     
-    st.header("Version 1.1 - 04/28/2021")
-    st.text("* Fixed bugs cache auto-refreshing")
-    st.text("* Fixed bugs overflow from user's input")
+    st.subheader("Version 1.1 - 04/28/2021")
+    st.write("* Fixed bugs cache auto-refreshing")
+    st.write("* Fixed bugs overflow from user's input")
     
-    st.header("Version 1.0 - 04/20/2021")
-    st.text("* Uploaded Web-beta version")
-    st.text("* Tested Gameplay and Data Flow")
+    st.subheader("Version 1.0 - 04/20/2021")
+    st.write("* Uploaded Web-beta version")
+    st.write("* Tested Gameplay and Data Flow")
     
     
     
