@@ -17,14 +17,24 @@ Base = declarative_base()
 class UserInput(Base):
     __tablename__ = "userinputs"
     
+    id = Column(Integer)
+    username = Column(String, primary_key = True)
+    passcode = Column(String)   
+    rewards = Column(Integer)
+    playing_time = Column(Integer)
+
+
+class UserHistory(Base):
+    __tablename__ = "userhistory"
+    
     id = Column(Integer, primary_key = True)
-    firstname = Column(String)
-    lastname = Column(String)
-    no_of_guess = Column(Integer)
+    username = Column(String)
+    passcode = Column(String) 
+    guess_numbers = Column(Integer)
+    this_rewards = Column(Integer)
     date_win = Column(String)
-    feedback = Column(String)
-    rating= Column(Integer)
+    
     
 if __name__ == "__main__":
-    engine = create_engine('sqlite:///number_game2_db.sqlite')
+    engine = create_engine('sqlite:///web_game4_db.sqlite')
     Base.metadata.create_all(engine)
