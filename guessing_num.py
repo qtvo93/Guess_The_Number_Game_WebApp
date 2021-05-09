@@ -419,20 +419,22 @@ if choice == "Game Statistics":
             # control_anonymous+=1   
             
     
-    output_uni = []
+    output_uni = {}
     if st.checkbox("Check here to see Token Leader(s)"):
         reward_list.sort(reverse = True)
-        i =0
-        for key,item in unique_dict.items():
-                if item[0] == reward_list[0]:
-                    i+=1
-                    st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
-                if item[0] == reward_list[1]:
-                    i+=1
-                    st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
-                if item[0] == reward_list[2]:
-                    i+=1
-                    st.write(i,"💰  Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
+        output_uni = dict(sorted(unique_dict.items(),key=lambda x: x[1], reverse= True))   
+        i = 0
+        
+        for key,item in output_uni.items():
+            if item[0] == reward_list[0]:
+                i+=1
+                st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
+            if item[0] == reward_list[1]:
+                i+=1
+                st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
+            if item[0] == reward_list[2]:
+                i+=1
+                st.write(i,"💰  Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
     # Graph players vs guesses
     st.subheader("Winner Registration ID vs Number of guess per Winner ID")
     fig = plt.figure(1)
