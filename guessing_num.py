@@ -53,7 +53,7 @@ expander_bar = st.beta_expander("About the App")
 expander_bar.markdown("""
 * **Guess the Number Game** is a simple Web-App to demonstrate Python, SQL and Data Science streamlit framework
 * **Python libraries:**  streamlit, numpy, bcrypt, functools, random, matplotlib, sqlalchemy
-* **Version 2.1:** App written by [Quoc Thinh Vo](https://quoctvo.com). 
+* **Version 2.2:** App written by [Quoc Thinh Vo](https://quoctvo.com). 
     Please open the Navigation bar and choose Game Versions for more information                                                                                                                                        
 
     
@@ -95,7 +95,7 @@ def cache_on_button_press(label, **cache_kwargs):
     
 #st.subheader("*************************************")
 menu = ["Home", "Game Statistics", "Game Versions"]
-choice = st.selectbox("Navigation bar", menu)   
+choice = st.selectbox("Navigation", menu)   
  	
 #%% function declarations
 
@@ -130,8 +130,8 @@ if choice == "Home":
     #     st.stop().Exception()
     state = get_state(setup, a=1, b=1,reward=0,trivia=0)
     menu2 = ["Easy","Medium","Hard"] #"Custom"
-    st.write("The more difficult, the better rewards!")
-    level = st.selectbox("Please choose a difficult level and start:",menu2)
+    st.write("The more difficult level, the better rewards!")
+    level = st.selectbox("Please choose a difficult level and start playing:",menu2)
     min_num = 0
     max_num = 0
     if level == "Easy":
@@ -220,6 +220,9 @@ if choice == "Home":
         
         # Form header and form generating:
         st.subheader("Submit your winning records for rewards")
+        st.write("* Already have an account?")
+        st.write("Submit records using your created Username and Password to earn accumluated rewards")
+        st.write("* Or simply type in new Username and Password to create an account and start earning")
         username1 , passcode1 = st.beta_columns(2)
         with username1:
             U_name = st.text_input("Username")
@@ -228,7 +231,8 @@ if choice == "Home":
         
         
         this_reward = state.reward
-        now = str(time.strftime("%c"))
+        now_local = time.localtime()
+        now = str(time.strftime("%c",now_local))
         
         
         if st.checkbox("Not a spamming bot? Please check here"):
@@ -295,7 +299,7 @@ if choice == "Home":
                         
                     # There's user already but wrong passcode
                         elif x.passcode != my_pw:
-                            st.error("Username already exists! Please use a different Username or make sure Passcode is correct")
+                            st.error("Username already exists! Please use a different Username or make sure Password is correct")
                     
                     # Matched user and passcode:
                         elif x.passcode == my_pw:
@@ -402,7 +406,7 @@ if choice == "Game Statistics":
     
     
    
-    if st.checkbox("Check here to see best record winner list "):
+    if st.checkbox("Check here to see Best Record Winner(s)"):
         #st.write(" 🔥 🔥 🔥 Username ")
         Id = 0
         # control_anonymous = 0
@@ -416,11 +420,18 @@ if choice == "Game Statistics":
             
     reward_list.sort(reverse = True)
     output_uni = []
-    if st.checkbox("Check here to see tokens leader list"):
-    
+    if st.checkbox("Check here to see Token Leader(s)"):
+        i =0
         for key,item in unique_dict.items():
                 if item[0] == reward_list[0]:
-                    st.write("💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
+                    i+=1
+                    st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
+                if item[0] == reward_list[1]:
+                    i+=1
+                    st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
+                if item[0] == reward_list[2]:
+                    i+=1
+                    st.write(i,"💰  Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
     # Graph players vs guesses
     st.subheader("Winner Registration ID vs Number of guess per Winner ID")
     fig = plt.figure(1)
@@ -472,11 +483,11 @@ if choice == "Game Statistics":
     if max(x_axis2) < 25:
         ax2.xaxis.set_ticks(np.arange(min(x_axis2), max(x_axis2)+1, 1))
     ax2.legend()
-    ax2.set_ylabel("Number of candies")
+    ax2.set_ylabel("Number of candy tokens")
     ax2.set_xlabel("Registered Winner ID")  
     # 🔥 fire icon     
     st.subheader("The Community Power")
-    st.write("Imagine we double the number of candy tokens generated each time we got a new winner")  
+    st.write("Imagine the number of candy tokens generated is doubled each time there's a new winner")  
     st.write("Wonder how many tokens our community would receive?")
     current_h5= sum(y_candy_list)
     st.write("🍭 Total candy tokens generated:",current_h5)
@@ -491,19 +502,23 @@ if choice == "Game Statistics":
 #     # Testing form
 #     #---------------------------------------------#
     # Retrieve data form
-    a=st.selectbox("Would you like to check your playing records?",["General Information","In Details"])
-    if a == "General Information":
+    #a=st.selectbox("Would you like to check your playing records?",["General Information","In Details"])
+    #if a == "General Information":\
+    if 1:
         with st.form('records_form'):
-        
+            st.subheader("Would you like to check your playing records?")
             firstname2 , usercode2 = st.beta_columns(2)
             with firstname2:
                 F_name2 = st.text_input("Userame")
             with usercode2:
                 code2 = st.text_input("Password",type="password")
-                
-            view_data_button = st.form_submit_button(label='Click to view records')
-      
-                
+            
+            col1,col2 = st.beta_columns([1,1])
+            with col1:
+                view_data_button = st.form_submit_button(label='View Account Tokens')
+            with col2:
+                view_data_button2 = st.form_submit_button(label='View Account Playing History')
+               
         if view_data_button:
             
             x = sess.query(UserInput).get(F_name2)
@@ -522,16 +537,17 @@ if choice == "Game Statistics":
             if st.button("Close Displays"):
                 caching.clear_cache()
                 raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
-    if a == "In Details":
-        with st.form('records_form2'):
+    #if a == "In Details":
+    # if 1:
+    #     with st.form('records_form2'):
       
-            firstname2 , usercode2 = st.beta_columns(2)
-            with firstname2:
-                F_name2 = st.text_input("Userame")
-            with usercode2:
-                code2 = st.text_input("Password",type="password")
+    #         firstname2 , usercode2 = st.beta_columns(2)
+    #         with firstname2:
+    #             F_name2 = st.text_input("Userame")
+    #         with usercode2:
+    #             code2 = st.text_input("Password",type="password")
                 
-            view_data_button2 = st.form_submit_button(label='Click to view records')
+            
       
                 
         if view_data_button2:
@@ -583,7 +599,7 @@ if choice == "Game Versions":
     st.subheader("Version 2.1 - 05/05/2021")
     st.write("* Added SQL data base for game experience recording")
     st.write("* Updated live web scraping data")
-    st.write("* Changed: GUI - Minimum and Maximum number: from slider to input box")
+    st.write("* Changed: GUI - Removed Custom range - Added pre-designed difficult level")
     st.write("* Changed: GUI - Removed Sidebar - Added Navigation bar")
     st.write("* Added: Best record player list")
     st.write("* Added: Retrieving personal records functionality")
