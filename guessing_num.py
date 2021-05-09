@@ -412,29 +412,35 @@ if choice == "Game Statistics":
         # control_anonymous = 0
         for player_out in print_out_winner:
             Id+=1                                 
-            st.write("🔥 Username:",player_out)
+            st.write(Id,"🔥Username:",player_out)
+            st.write("_______________")
             # else:              
             #     registed_ID = find_winner_ID[control_anonymous]
             #     st.write(Id,":","Anonymous registered ID",registed_ID)
             # control_anonymous+=1   
             
     
-    output_uni = {}
+    def get_key(val):
+        for key, value in unique_dict.items():
+             if val == value[0]:
+                 return key
+   
+    
+    i = 0
+    #removed_value=[]
     if st.checkbox("Check here to see Token Leader(s)"):
-        reward_list.sort(reverse = True)
-        output_uni = dict(sorted(unique_dict.items(),key=lambda x: x[1], reverse= True))   
-        i = 0
-        
-        for key,item in output_uni.items():
-            if item[0] == reward_list[0]:
-                i+=1
-                st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
-            if item[0] == reward_list[1]:
-                i+=1
-                st.write(i,"💰 Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
-            if item[0] == reward_list[2]:
-                i+=1
-                st.write(i,"💰  Username:",key,"--- Total tokens won:",item[0],"--- Played: ",item[1],"times")
+
+        for i in range(3):
+            max_token = max(reward_list) 
+            for key, item in unique_dict.items():
+                if max_token == item[0]:
+                    st.write("💰",i+1,"{ Username:",key,"} { total tokens won:",item[0],"} { played: ",item[1],"times }💰")  
+                    #st.write("_______________")
+           # removed_value.append(unique_dict.pop(get_key(max_token))[0])                     
+            while max_token == max(reward_list):        
+                reward_list.pop(reward_list.index(max_token))
+     
+            i +=1
     # Graph players vs guesses
     st.subheader("Winner Registration ID vs Number of guess per Winner ID")
     fig = plt.figure(1)
