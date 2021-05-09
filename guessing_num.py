@@ -418,9 +418,10 @@ if choice == "Game Statistics":
             #     st.write(Id,":","Anonymous registered ID",registed_ID)
             # control_anonymous+=1   
             
-    reward_list.sort(reverse = True)
+    
     output_uni = []
     if st.checkbox("Check here to see Token Leader(s)"):
+        reward_list.sort(reverse = True)
         i =0
         for key,item in unique_dict.items():
                 if item[0] == reward_list[0]:
