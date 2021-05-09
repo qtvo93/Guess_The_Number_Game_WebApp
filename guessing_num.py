@@ -221,7 +221,7 @@ if choice == "Home":
         # Form header and form generating:
         st.subheader("Submit your winning records for rewards")
         st.write("* Already have an account?")
-        st.write("Submit records using your created Username and Password to earn accumluated rewards")
+        st.write("Submit records using your created Username and Password to earn accumulated rewards")
         st.write("* Or simply type in new Username and Password to create an account and start earning")
         username1 , passcode1 = st.beta_columns(2)
         with username1:
