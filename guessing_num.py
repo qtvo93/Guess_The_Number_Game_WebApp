@@ -48,7 +48,7 @@ st.title('Guess the Number Game')
 
 #---------------------------------#
 # About
-expander_bar = st.beta_expander("About the App")
+expander_bar = st.expander("About the App")
 
 expander_bar.markdown("""
 * **Guess the Number Game** is a simple Web-App to demonstrate Python, SQL and Data Science streamlit framework
