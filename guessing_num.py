@@ -223,7 +223,7 @@ if choice == "Home":
         st.write("* Already have an account?")
         st.write("Submit records using your created Username and Password to earn accumulated rewards")
         st.write("* Or simply type in new Username and Password to create an account and start earning")
-        username1 , passcode1 = st.beta_columns(2)
+        username1 , passcode1 = st.columns(2)
         with username1:
             U_name = st.text_input("Username")
         with passcode1:
@@ -240,7 +240,7 @@ if choice == "Home":
             st.write("Great, thank you!")
             
             
-        col2,col3 = st.beta_columns([3,3])    
+        col2,col3 = st.columns([3,3])    
         with col2:
             st.write("Winning Rewards:")
             st.write(this_reward,"candy tokens +🍭+")
@@ -516,13 +516,13 @@ if choice == "Game Statistics":
     if 1:
         with st.form('records_form'):
             st.subheader("Would you like to check your playing records?")
-            firstname2 , usercode2 = st.beta_columns(2)
+            firstname2 , usercode2 = st.columns(2)
             with firstname2:
                 F_name2 = st.text_input("Userame")
             with usercode2:
                 code2 = st.text_input("Password",type="password")
             
-            col1,col2 = st.beta_columns([1,1])
+            col1,col2 = st.columns([1,1])
             with col1:
                 view_data_button = st.form_submit_button(label='View Account Tokens')
             with col2:
@@ -550,7 +550,7 @@ if choice == "Game Statistics":
     # if 1:
     #     with st.form('records_form2'):
       
-    #         firstname2 , usercode2 = st.beta_columns(2)
+    #         firstname2 , usercode2 = st.columns(2)
     #         with firstname2:
     #             F_name2 = st.text_input("Userame")
     #         with usercode2:
