@@ -16,7 +16,8 @@ import numpy as np
 #import pandas as pd
 #import SessionState
 import bcrypt
-from streamlit import caching
+#from streamlit import caching
+from streamlit import legacy_caching
 from streamlit.script_runner import StopException, RerunException
 from sqlalchemy.orm import sessionmaker
 from project_orm_guess_game import UserInput, UserHistory
@@ -165,11 +166,11 @@ if choice == "Home":
     #ss = SessionState.get(x=1)
     
     
-   # timer = SessionState.get(t=0)
+    #timer = SessionState.get(t=0)
     #current=time.time()
     #start_time = get_state(setup, a= current)
     rand_num = play(min_num,max_num)
-
+    
     #%% Section 2: Generating random number and guessing
     with st.form(key='guess'):
         st.write("The generated random number is between: ",min_num,"and",max_num)        
@@ -250,7 +251,7 @@ if choice == "Home":
             st.write(now)
     
         submit_button = st.form_submit_button(label='Submit')
-        
+       
     if submit_button :
         
         if not state.trivia:
@@ -294,7 +295,7 @@ if choice == "Home":
                                             
                             st.success('✅ Records successfully submitted. The game will automatically reset shortly!')
                             time.sleep(4.5)
-                            caching.clear_cache()
+                            legacy_caching.clear_cache()
                             raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
                         
                     # There's user already but wrong passcode
@@ -324,15 +325,16 @@ if choice == "Home":
                                             
                             st.success('✅ Records successfully submitted. The game will automatically reset shortly!')
                             time.sleep(4.5)
-                            caching.clear_cache()
+                            ##caching.clear_cache()
                             raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
             
                 except Exception as e:
                     st.error(f"❌ Some error occured : {e}")
                     st.error('The page will reset shortly')
                     time.sleep(4.5) 
-                    caching.clear_cache()
+                    #caching.clear_cache()
                     raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
+  
 #%% choice == GAME STATISTICs
 import matplotlib.pyplot as plt
 
@@ -544,7 +546,7 @@ if choice == "Game Statistics":
                 st.error("No records found for this user")
                 
             if st.button("Close Displays"):
-                caching.clear_cache()
+                #caching.clear_cache()
                 raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
     #if a == "In Details":
     # if 1:
@@ -582,7 +584,7 @@ if choice == "Game Statistics":
                 st.error("No records found for this user")
                 
             if st.button("Close History"):
-                caching.clear_cache()
+                #caching.clear_cache()
                 raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
         
 
@@ -598,6 +600,10 @@ if choice == "Game Versions":
     
     st.subheader("Potential Updates")
     st.write("* Building a Machine Learning model to study user's strategy and replicate performance")
+
+    st.subheader("Version 2.3 - 10/08/2021")
+    st.write("* Fixed: Streamlit library caching issue")
+    st.write("* Fixed: missing Cloud access key for EC2 instance when merging repository")
     
     st.subheader("Version 2.2 - 05/08/2021")
     st.write("* Updated username and password sign-in to retrieve personal records")
