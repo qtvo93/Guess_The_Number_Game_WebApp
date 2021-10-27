@@ -326,6 +326,7 @@ if choice == "Home":
                             st.success('✅ Records successfully submitted. The game will automatically reset shortly!')
                             time.sleep(4.5)
                             ##caching.clear_cache()
+                            legacy_caching.clear_cache()
                             raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
             
                 except Exception as e:
@@ -333,6 +334,7 @@ if choice == "Home":
                     st.error('The page will reset shortly')
                     time.sleep(4.5) 
                     #caching.clear_cache()
+                    legacy_caching.clear_cache()
                     raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
   
 #%% choice == GAME STATISTICs
@@ -547,6 +549,7 @@ if choice == "Game Statistics":
                 
             if st.button("Close Displays"):
                 #caching.clear_cache()
+                legacy_caching.clear_cache()
                 raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
     #if a == "In Details":
     # if 1:
@@ -585,6 +588,7 @@ if choice == "Game Statistics":
                 
             if st.button("Close History"):
                 #caching.clear_cache()
+                legacy_caching.clear_cache()
                 raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
         
 
