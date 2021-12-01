@@ -2,7 +2,6 @@
 """
 Created on Sat May  1 17:58:58 2021
 
-@author: QTVo
 """
 
 
