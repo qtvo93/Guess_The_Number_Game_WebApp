@@ -2,7 +2,6 @@
 """
 Created on Tue May  4 19:31:29 2021
 
-@author: QTVo
 """
 from typing import Callable, TypeVar
 try:
