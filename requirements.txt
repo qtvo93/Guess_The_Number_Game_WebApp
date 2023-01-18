@@ -1,5 +1,5 @@
 streamlit==0.81.1
-numpy==1.18.1
+numpy==1.25.0
 SQLAlchemy==1.4.14
 bcrypt==3.2.0
 matplotlib==3.4.2
